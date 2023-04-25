@@ -2,34 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Post\StoreRequest;
+use App\Http\Requests\Post\UpdateRequest;
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\PostTag;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 
-class PostController extends Controller
+class PostController extends MainController
 {
+
     public function index()
     {
-        $post = Post::find(5);
-        $tag = Tag::find(5);
-        dd($tag->posts);
-        //return view('posts.index', compact('posts'));
+        $posts = Post::paginate(5);
+        return view('posts.index', compact('posts'));
     }
 
     public function create()
     {
-        return view('posts.create');
+        $categories = Category::all();
+        $tags = Tag::all();
+        return view('posts.create', compact('categories', 'tags'));
     }
 
-    public function store()
+    public function store(StoreRequest $storeRequest)
     {
-        $data = request()->validate([
-            'title' => 'string',
-            'content' => 'string',
-        ]);
+        $data = $storeRequest->validated();
 
-        Post::create($data);
+        $this->service->store($data);
+
         return redirect()->route('posts.index');
         
     }
@@ -41,16 +43,17 @@ class PostController extends Controller
 
     public function edit(Post $post)
     {
-        return view('posts.edit', compact('post'));
+        $categories = Category::all();
+        $tags = Tag::all();
+        return view('posts.edit', compact('post', 'categories', 'tags'));
     }
 
-    public function update(Post $post)
+    public function update(Post $post, UpdateRequest $updateRequest)
     {
-        $data = request()->validate([
-            'title' => 'string',
-            'content' => 'string',
-        ]);
-        $post->update($data);
+        $data = $updateRequest->validated();
+        
+        $this->service->update($post, $data);
+
         return redirect()->route('posts.show', $post->id);
     }
 
