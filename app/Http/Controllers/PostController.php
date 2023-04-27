@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Filters\PostFilter;
 use App\Http\Requests\Post\StoreRequest;
 use App\Http\Requests\Post\UpdateRequest;
+use App\Http\Requests\Post\FilterRequest;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\PostTag;
@@ -13,9 +15,13 @@ use Illuminate\Http\Request;
 class PostController extends MainController
 {
 
-    public function index()
+    public function index(FilterRequest $filterRequest)
     {
-        $posts = Post::paginate(5);
+        $data = $filterRequest->validated();
+
+        $filter = app()->make(PostFilter::class, ['queryParams' => array_filter($data)]);
+        $posts = Post::filter($filter)->paginate(5);
+
         return view('posts.index', compact('posts'));
     }
 
