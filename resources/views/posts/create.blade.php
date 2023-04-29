@@ -1,4 +1,4 @@
-@extends('layouts.main')
+@extends('layouts.app')
 @section('content')
     <div class="w-25 mx-auto">
         <form action="{{route('posts.store')}}" method="post">

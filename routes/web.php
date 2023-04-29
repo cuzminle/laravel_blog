@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PostController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('welcome')->name('home');
 });
 
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
@@ -27,3 +29,12 @@ Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.e
 
 Route::patch('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
 Route::delete('/posts/{post}', [PostController::class, 'delete'])->name('posts.delete');
+
+Route::group(['middleware' => 'admin'], function(){
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+    Route::get('/admin/post', [AdminController::class, 'post'])->name('admin.post.index');
+});
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

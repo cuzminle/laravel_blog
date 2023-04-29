@@ -17,6 +17,7 @@ class PostController extends MainController
 
     public function index(FilterRequest $filterRequest)
     {
+        $this->authorize('view', auth()->user());
         $data = $filterRequest->validated();
 
         $filter = app()->make(PostFilter::class, ['queryParams' => array_filter($data)]);
