@@ -33,7 +33,11 @@
                         <li class="nav-item active">
                             <a class="nav-link" href="{{route('posts.create')}}">Create</a>
                         </li>
-                        
+                        @can('view', auth()->user())
+                            <li class="nav-item active">
+                                <a class="nav-link" href="{{route('admin.post.index')}}">Admin</a>
+                            </li>
+                        @endcan
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -68,6 +72,7 @@
                                         @csrf
                                     </form>
                                 </div>
+                                
                             </li>
                         @endguest
                     </ul>

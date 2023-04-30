@@ -6,6 +6,7 @@ use App\Http\Filters\PostFilter;
 use App\Http\Requests\Post\StoreRequest;
 use App\Http\Requests\Post\UpdateRequest;
 use App\Http\Requests\Post\FilterRequest;
+use App\Http\Resources\PostResource;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\PostTag;
@@ -17,13 +18,12 @@ class PostController extends MainController
 
     public function index(FilterRequest $filterRequest)
     {
-        $this->authorize('view', auth()->user());
         $data = $filterRequest->validated();
 
         $filter = app()->make(PostFilter::class, ['queryParams' => array_filter($data)]);
         $posts = Post::filter($filter)->paginate(5);
-
-        return view('posts.index', compact('posts'));
+        return PostResource::collection($posts);
+        //return view('posts.index', compact('posts'));
     }
 
     public function create()
@@ -36,10 +36,10 @@ class PostController extends MainController
     public function store(StoreRequest $storeRequest)
     {
         $data = $storeRequest->validated();
+        $post = $this->service->store($data);
 
-        $this->service->store($data);
-
-        return redirect()->route('posts.index');
+        return new PostResource($post);
+        //return redirect()->route('posts.index');
         
     }
 
@@ -60,8 +60,8 @@ class PostController extends MainController
         $data = $updateRequest->validated();
         
         $this->service->update($post, $data);
-
-        return redirect()->route('posts.show', $post->id);
+        return new PostResource($post);
+        //return redirect()->route('posts.show', $post->id);
     }
 
     public function delete(Post $post)
