@@ -19,7 +19,6 @@ class PostController extends MainController
     public function index(FilterRequest $filterRequest)
     {
         $data = $filterRequest->validated();
-
         $filter = app()->make(PostFilter::class, ['queryParams' => array_filter($data)]);
         $posts = Post::filter($filter)->paginate(5);
         return PostResource::collection($posts);
@@ -37,15 +36,16 @@ class PostController extends MainController
     {
         $data = $storeRequest->validated();
         $post = $this->service->store($data);
+        return $post instanceof Post ? new PostResource($post) : $post;
 
-        return new PostResource($post);
         //return redirect()->route('posts.index');
         
     }
 
     public function show(Post $post)
     {
-        return view('posts.show', compact('post'));
+        return new PostResource($post);
+        //return view('posts.show', compact('post'));
     }
 
     public function edit(Post $post)
@@ -58,9 +58,8 @@ class PostController extends MainController
     public function update(Post $post, UpdateRequest $updateRequest)
     {
         $data = $updateRequest->validated();
-        
         $this->service->update($post, $data);
-        return new PostResource($post);
+        return $post instanceof Post ? new PostResource($post) : $post;
         //return redirect()->route('posts.show', $post->id);
     }
 
